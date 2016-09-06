@@ -74,7 +74,7 @@ White space must separate individual fields of specification line.
 Each descriptor line must begin with a letter and lies on a single line with no white space
 before the first symbol.   The tokens that generate descriptor lines are \<header\>, \<segment\>,
 \<fragment\>, \<edge\>, \<gap\>, and \<group\>.
-Any line that does not begin with a recognized code (i.e. H, S, F, E, or G) can be ignored.
+Any line that does not begin with a recognized code (i.e. H, S, F, E, G, or P) can be ignored.
 This will allow users to have additional descriptor lines specific to their special processes.
 Moreover, the suffix of any DAS descriptor line may contain any number of user-specific SAM
 tags which are ignored by software designed to support the core standard.  These user-specific
