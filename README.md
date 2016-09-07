@@ -10,9 +10,9 @@ eventually some version of it might find adoption.
 
 The reason that we want a standard is that we find that
 in general, *different* development teams build assemblers, visualizers, and editors because
-of the complexity and distanct nature of the three tasks.  While these tools should certainly
+of the complexity and distinct nature of the three tasks.  While these tools should certainly
 use tailored encodings internally for efficiency, the nexus between the three efforts
-would benefit from a standard encoding format creating greater interoperability between them.
+would benefit from a standard encoding format that would make them all interoperable.
 
 ![Fig. 1](READ.Fig1.png)
 
