@@ -48,7 +48,7 @@ assembly can be described.
 
 <gap>      <- G <eid>:id> <sid1:id> [+-] <sid2:id> <dist:int> <var:int>
 
-<group>    <- P[UO] <name:id> <item>+
+<group>    <- P[UO] <name:id> <item>([ ]<item>)*
 
     <id>        <- [!-~]+
     <item>      <- <sid:id> | <eid:id>
@@ -151,7 +151,9 @@ Such a collection could for example be hilighted by a drawing program on
 command, or might specify decisions about tours through the graph.  The P is immediately
 follwed by U or O indicating either an *unordered* or *ordered* collection.  The remainder of
 the line then consists of a name for the collection followed by a non-empty list of ID's
-refering to segments and/or edges.  An unordered collection refers to
+refering to segments and/or edges that are *separated by single spaces* (i.e. the list is
+in a single column of the tab-delimited format).  An unordered
+collection refers to
 the subgraph induced by the vertices and edges in the collection (i.e. one adds all edges
 between a pair of segments in the list and one adds all segments adjacent to edges in the
 list.)   An ordered collection captures paths in the graph consisting of the listed objects
