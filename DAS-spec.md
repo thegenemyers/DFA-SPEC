@@ -48,14 +48,13 @@ assembly can be described.
 
 <gap>      <- G <eid>:id> <sid1:id> [+-] <sid2:id> <dist:int> <var:int>
 
-<group>    <- P <name:id> <item>(, <item>) *
-            | P <name:id> <item> <item> *
+<group>    <- P[UO] <name:id> <item>+
 
     <id>        <- [!-~]+
     <item>      <- <sid:id> | <eid:id>
     <pos>       <- ^ | <int> | $
     <sequence>  <- * | [A-Za-z]+
-    <alignment> <- TR:B:<trace array>
+    <alignment> <- TR:B:i<trace array>
                    CG:Z:<CIGAR string>
 
       <CIGAR string> <- ([0-9]+[MX=ID])+
@@ -69,7 +68,8 @@ operator <-, and the following marks:
   * * zero-or-more
   * + one-or-more
   * [] a set of one character alternatives.
-White space must separate individual fields of specification line.
+Like GFA, DAS is tab-delimited in that every lexical token is separated from the next
+by a single tab.
 
 Each descriptor line must begin with a letter and lies on a single line with no white space
 before the first symbol.   The tokens that generate descriptor lines are \<header\>, \<segment\>,
@@ -146,11 +146,10 @@ or 0 if no estimate is available.
 
 A group encoding on a P-line allows one to name and specify a subgraph of the overall graph.
 Such a collection could for example be hilighted by a drawing program on
-command, or might specify decisions about tours through the graph.  A P-line begins with the
-name for the collection which may be any string of non-white space characters.  This is then
-followed by a list of ID's refering to segments and/or edges where the list
-is either white-space or comma separated.  If white-space separated, then the collection
-is *unordered* and if comma separated it is *ordered*.  An unordered collection refers to
+command, or might specify decisions about tours through the graph.  The P is immediately
+follwed by U or O indicating either an *unordered* or *ordered* collection.  The remainder of
+the line then consists of a name for the collection followed by a non-empty list of ID's
+refering to segments and/or edges.  An unordered collection refers to
 the subgraph induced by the vertices and edges in the collection (i.e. one adds all edges
 between a pair of segments in the list and one adds all segments adjacent to edges in the
 list.)   An ordered collection captures paths in the graph consisting of the listed objects
