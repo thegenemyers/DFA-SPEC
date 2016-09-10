@@ -41,7 +41,7 @@ assembly can be described.
 <segment>  <- S <sid:id> <slen:int> <sequence>
 
 <fragment> <- F <sid:id> [+-] <external:id>
-                  <sbeg:int> <send:int> {CL:B:<pbeg>,<pend>,<plen>} {<alignment>}
+                  <sbeg:int> <send:int> {CL:B:i<pbeg>,<pend>,<plen>} {<alignment>}
 
 <edge>     <- E <eid:id> <sid1:id> [+-] <sid2:id>
                          <beg1:pos> <end1:pos> <beg2:pos> <end2:pos> {<alignment>}
