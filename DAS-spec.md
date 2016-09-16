@@ -1,4 +1,4 @@
-# **DAS: The Dagstuhl Assembly Standard (V 1.0)**
+# **DAS: The Dagstuhl Assembly Specification (V 1.0)**
 
 *J. Chin, R.Durbin, G. Myers*  
 *Aug. 31, 2016*
@@ -12,7 +12,7 @@ graph at any stage of assembly, from the graph of all overlaps, to a final resol
 of contig paths with multi-alignments.  Apart from meeting our needs, the extensions also
 supports other assembly and variation graph types.
 
-We futher want to emphasize that we are proposing a core standard.  As will be seen later in
+We further want to emphasize that we are proposing a core standard.  As will be seen later in
 the technical specification, the format is **extensible** in that additional description lines
 can be added and additional SAM tags can be appended to core description lines.
 
@@ -29,7 +29,8 @@ alignment in linear time, and CIGAR strings are a SAM concept explicitly detaili
 columns of an alignment.  Many new technologies such a Hi-C and BioNano maps organize segments
 into scaffolds along with traditional data sets involving paired reads, and so a “gap” edge
 concept is also introduced so that order and orientaiton between disjoint contigs of an
-assembly can be described.
+assembly can be described.  Finally, one can describe and attach a name to any path or
+subgraph in the encoded string graph.
 
 ## GRAMMAR
 
@@ -41,10 +42,10 @@ assembly can be described.
 <segment>  <- S <sid:id> <slen:int> <sequence>
 
 <fragment> <- F <sid:id> [+-] <external:id>
-                  <sbeg:int> <send:int> {CL:B:i<pbeg>,<pend>,<plen>} {<alignment>}
+                  <sbeg:pos> <send:pos> <fbeg:pos> <fend:pos> <alignment>
 
 <edge>     <- E <eid:id> <sid1:id> [+-] <sid2:id>
-                         <beg1:pos> <end1:pos> <beg2:pos> <end2:pos> {<alignment>}
+                         <beg1:pos> <end1:pos> <beg2:pos> <end2:pos> <alignment>
 
 <gap>      <- G <eid>:id> <sid1:id> [+-] <sid2:id> <dist:int> <var:int>
 
@@ -52,10 +53,9 @@ assembly can be described.
 
     <id>        <- [!-~]+
     <item>      <- <sid:id> | <eid:id>
-    <pos>       <- ^ | <int> | $
+    <pos>       <- <int> | ${<int>}
     <sequence>  <- * | [A-Za-z]+
-    <alignment> <- TR:B:i<trace array>
-                   CG:Z:<CIGAR string>
+    <alignment> <- * | <trace array> | <CIGAR string>
 
       <CIGAR string> <- ([0-9]+[MX=ID])+
       <trace array>  <- <int>(,<int>)*
@@ -97,10 +97,9 @@ an indication to a drawing program of how long to draw the representation of the
 Fragments, if present, are encoded in F-lines that give (a) the segment they belong to, (b) the
 orientation of the fragment to the segment, (c) an external ID that references a sequence
 in an external collection (e.g. a database of reads or segments in another DAS or SAM file),
-and (d) the interval of the vertex segment that the external string contributes to.  One can
-optionally give a trace or CIGAR string detailing the alignment, and optionally specify, should
-clipping/trimming the fragment sequence be necessary, what portion of the fragment is used and
-its length with a CL-tag.
+and (d) the interval of the vertex segment that the external string contributes to, and (e)
+the interval of the fragment that contributes to to segment.  One concludes with either a
+trace or CIGAR string detailing the alignment, or a * if absent.
 
 Edges are encoded in E-lines that in general represent a local alignment between arbitrary
 intervals of the sequences of the two vertices in question. One gives first an edge ID and
@@ -109,17 +108,25 @@ the second segment should be complemented or not.  An edge ID does not need to b
 distinct from a segment ID, *unless* you plan to refer to it in a P-line (see below).  This
 allows you to use something short like a single *-sign as the id when it is not needed.
 
-A CIGAR string (or trace) describing the alignment is optional, but
-one must give the intervals that are aligned as a pair of positions where a position can have
-the special value ^ denoting the beginning of the segment, or the special value $ denoting
-the end of the segment.  An edge may optionally be given a unique ID in the case that
-a user needs to explicitly refer to it in a group line (see below).  This is specified by
-optionally giving the ID prefixed with an @-sign at the start of the line.
+One then gives the intervals of each segment that align, each as a pair of *positions*.  A position
+is either an integer or the special symbol $ optionally followed immediately by an integer.
+If an integer, the position is the distance from the left end of the segment, if $, the
+right end of the sequence, and if $ followed by an integer, the distance from the right end
+of the sequence.  This ability to define a 0-based position from either end of a segment
+allows one to conveniently address end-relative positions without knowing the length of
+the segments.  Note carefully, that the segment and fragment intervals in an F-line are
+also positions.
+
+A field for a CIGAR string or trace describing the alignment is last, but may be absent
+by giving a *.  One gives CIGAR string to describe an exact alignment relationship between
+the two segments.  A trace string by contrast is given when simply wants an accelerated
+method for computing an alignment between the two intervals.  If a * is given as the alignment
+note that it is still possible to compute the implied alignment by brute force.
 
 The DAS concept of edge generalizes the link and containment lines of GFA.  For example a GFA
 edge which encodes what is called a dovetail overlap (because two ends overlap) is simply a DAS
-edge where end1 = $ and beg2 = ^ or beg1 = ^ and end2 = $.   A GFA containment is
-modeled by the case where beg2 = ^ and end2 = $ or beg1 = ^ and end1 = $.  The figure
+edge where end1 = $ and beg2 = 0 or beg1 = 0 and end2 = $.   A GFA containment is
+modeled by the case where beg2 = 0 and end2 = $ or beg1 = 0 and end1 = $.  The figure
 below illustrates:
 
 ![Fig. 1](DAS.Fig1.png)
@@ -168,3 +175,43 @@ to the edge in a P-line.  So an id in a P-line refers first to a segment id, and
 is no segment with that id, then to the edge with that id.  All segment id's must be
 unique, and it is an error if an id in a P-line does not refer to a unique edge id
 when a segment with the id does not exist.
+
+## EXTENSIONS
+
+```
+<link>     <- L <eid:id> <sid1:id> [+-] <sid2:id>
+                         <ovl1:int> <ovl2:int> {<alignment>}
+```
+
+Some users want a specific specification for edges that encode dovetail overlaps.  That
+is, <code>L s1 + s2 o1 o2</code> is a short hand for <code>E s1 + s2 $o1 $ 0 o2</code>.
+
+## BACKWARD COMPATIBILITY WITH GFA
+
+DAS is a superset of GFA, that is, everything that can be encoded in GFA can be encoded
+in DAS, with a relatively straightforward transformation of each input line.
+
+On the otherhand, a GFA parser, even one that accepts optional SAM-tags at the end of a
+defined line type, and which ignores line types it doesn't define, will not accept a
+DAS specification because of changes in the defined fields of the the S- and P-lines.
+Acheving this also makes no sense because DAS extends what was encoded in the L- and
+C-lines of GFA with a single E-line generalization.  So any effective DAS reader must
+read E-lines, and therefore must be an extension of a GFA parser.
+
+The syntactic conventions, however, are identical to GFA.  Each description line begins
+with a single letter and has a fixed set of fields that are tab-delimited.  The changes
+are as follows:
+
+1. There is an integer length field in S-lines.
+
+2. The L- and C-lines have been replaced by a consolidate E-line type.
+
+3. The P-line has been enhanced to encode both subgraphs and paths, and can take
+   edge id's that obviate the need for describing the alignment between segments.
+
+4. There is a new F-line for describing multi-alignments.
+
+5. Alignments can be trace length sequences as well as CIGAR strings.
+
+6. Positions have been extended to include a notation for 0-based position with respect
+   to the *end* of a segment (the default being with respect to the beginning).
