@@ -193,10 +193,10 @@ in DAS, with a relatively straightforward transformation of each input line.
 
 On the otherhand, a GFA parser, even one that accepts optional SAM-tags at the end of a
 defined line type, and which ignores line types it doesn't define, will not accept a
-DAS specification because of changes in the defined fields of the the S- and P-lines.
+DAS specification because of changes in the defined fields of the S- and P-lines.
 Acheving this also makes no sense because DAS extends what was encoded in the L- and
-C-lines of GFA with a single E-line generalization.  So any effective DAS reader must
-read E-lines, and therefore must be an extension of a GFA parser.
+C-lines of GFA with a single E-line generalization.  So any useful DAS reader must
+read E-lines, and therefore must be an extension of a GFA parser anyway.
 
 The syntactic conventions, however, are identical to GFA.  Each description line begins
 with a single letter and has a fixed set of fields that are tab-delimited.  The changes
@@ -204,7 +204,7 @@ are as follows:
 
 1. There is an integer length field in S-lines.
 
-2. The L- and C-lines have been replaced by a consolidate E-line type.
+2. The L- and C-lines have been replaced by a consolidated E-line.
 
 3. The P-line has been enhanced to encode both subgraphs and paths, and can take
    edge id's that obviate the need for describing the alignment between segments.
@@ -214,4 +214,4 @@ are as follows:
 5. Alignments can be trace length sequences as well as CIGAR strings.
 
 6. Positions have been extended to include a notation for 0-based position with respect
-   to the *end* of a segment (the default being with respect to the beginning).
+   to *either* end of a segment (the default being with respect to the beginning).
