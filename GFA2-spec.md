@@ -34,7 +34,7 @@ assembly can be described.  Finally, one can describe and attach a name to any *
 ```
 <spec>     <- <header> ( <segment> | <edge> | <gap> | <group> )+
 
-<header>   <- H {VN:Z:1.0} {TS:i:<trace spacing>}
+<header>   <- H {VN:Z:2.0} {TS:i:<trace spacing>}
 
 <segment>  <- S <sid:id> <slen:int> <sequence>
 
@@ -80,7 +80,7 @@ tags which are ignored by software designed to support the core standard.
 
 ## SEMANTICS
 
-The header contains an optional 'VN' SAM-tag version number, 1.0, and an optional 'TS' SAM-tag specifying
+The header contains an optional 'VN' SAM-tag version number, 2.0, and an optional 'TS' SAM-tag specifying
 the trace point spacing for any Dazzler traces specified to accelerate alignment computation.
 
 A segment is specified by an S-line giving a user-specified ID for the
