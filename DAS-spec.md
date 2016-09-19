@@ -37,7 +37,7 @@ subgraph in the encoded string graph.
 ```
 <spec>     <- <header> ( <segment> | <edge> | <gap> | <group> )+
 
-<header>   <- H VN:Z:1.0 {TS:i:<trace spacing>}
+<header>   <- H {VN:Z:1.0} {TS:i:<trace spacing>}
 
 <segment>  <- S <sid:id> <slen:int> <sequence>
 
@@ -53,11 +53,11 @@ subgraph in the encoded string graph.
 
     <id>        <- [!-~]+
     <item>      <- <sid:id> | <eid:id>
-    <pos>       <- <int> | ${<int>}
+    <pos>       <- {$}<int>
     <sequence>  <- * | [A-Za-z]+
     <alignment> <- * | <trace array> | <CIGAR string>
 
-      <CIGAR string> <- ([0-9]+[MX=ID])+
+      <CIGAR string> <- ([0-9]+[MX=DIP])+
       <trace array>  <- <int>(,<int>)*
 ```
 
@@ -85,21 +85,22 @@ tags must occur after any of the optional SAM tags in the core specification abo
 
 ## SEMANTICS
 
-The header just contains a version number, 1.0, and if Dazzler trace points are used to
-efficiently encode alignments, then one needs to specify the trace point spacing with a
-TS tag in the header.
+The header contains an optional 'VN' SAM-tag version number, 1.0, and an optional 'TS' SAM-tag specifying
+the trace point spacing for any Dazzler traces specified to accelerate alignment computation.
 
 A segment is specified by an S-line giving a user-specified ID for the
 sequence, its length in bases, and the string of bases denoted by the segment or * if absent.
 The length does not need to be the actual length of the sequence, if given, but is rather
 an indication to a drawing program of how long to draw the representation of the segment.
+The segment sequences and any CIGAR strings referring to them if present follow the
+*unpadded* SAM convention.
 
 Fragments, if present, are encoded in F-lines that give (a) the segment they belong to, (b) the
 orientation of the fragment to the segment, (c) an external ID that references a sequence
 in an external collection (e.g. a database of reads or segments in another DAS or SAM file),
-and (d) the interval of the vertex segment that the external string contributes to, and (e)
+(d) the interval of the vertex segment that the external string contributes to, and (e)
 the interval of the fragment that contributes to to segment.  One concludes with either a
-trace or CIGAR string detailing the alignment, or a * if absent.
+trace or CIGAR string detailing the alignment, or a \* if absent.
 
 Edges are encoded in E-lines that in general represent a local alignment between arbitrary
 intervals of the sequences of the two vertices in question. One gives first an edge ID and
@@ -109,27 +110,32 @@ distinct from a segment ID, *unless* you plan to refer to it in a P-line (see be
 allows you to use something short like a single *-sign as the id when it is not needed.
 
 One then gives the intervals of each segment that align, each as a pair of *positions*.  A position
-is either an integer or the special symbol $ optionally followed immediately by an integer.
-If an integer, the position is the distance from the left end of the segment, if $, the
-right end of the sequence, and if $ followed by an integer, the distance from the right end
+is either an integer or the special symbol $ followed immediately by an integer.
+If an integer, the position is the distance from the *left* end of the segment,
+and if $ followed by an integer, the distance from the *right* end
 of the sequence.  This ability to define a 0-based position from either end of a segment
 allows one to conveniently address end-relative positions without knowing the length of
 the segments.  Note carefully, that the segment and fragment intervals in an F-line are
 also positions.
 
+Note carefully, that the positions intervals are always intervals in the segment in its normal
+orientation.  If a minus sign is specified, then the interval of the second segment is
+reverse complemented in order to align with the interval of the first segment.  That is,
+<code>S s1 - s2 b1 e1 b2 e2</code> aligns s1[b1,e1] to the reverse complement of s2[b2,e2].
+
 A field for a CIGAR string or trace describing the alignment is last, but may be absent
-by giving a *.  One gives CIGAR string to describe an exact alignment relationship between
-the two segments.  A trace string by contrast is given when simply wants an accelerated
-method for computing an alignment between the two intervals.  If a * is given as the alignment
+by giving a \*.  One gives a CIGAR string to describe an exact alignment relationship between
+the two segments.  A trace string by contrast is given when one simply wants an accelerated
+method for computing an alignment between the two intervals.  If a \* is given as the alignment
 note that it is still possible to compute the implied alignment by brute force.
 
 The DAS concept of edge generalizes the link and containment lines of GFA.  For example a GFA
 edge which encodes what is called a dovetail overlap (because two ends overlap) is simply a DAS
-edge where end1 = $ and beg2 = 0 or beg1 = 0 and end2 = $.   A GFA containment is
-modeled by the case where beg2 = 0 and end2 = $ or beg1 = 0 and end1 = $.  The figure
+edge where end1 = $0 and beg2 = 0 or beg1 = 0 and end2 = $0.   A GFA containment is
+modeled by the case where beg2 = 0 and end2 = $0 or beg1 = 0 and end1 = $0.  The figure
 below illustrates:
 
-![Fig. 1](DAS.Fig1.png)
+![Illustration of position and edge definitions](DAS.Fig1.png)
 
 Special codes could be adopted for dovetail and containment relationships but the thought is
 there is no particular reason to do so, the use of the special characters for terminal positions
@@ -140,7 +146,7 @@ bubbles as the primary “contig”, and then capture the two buble alternatives
 linked with generalized edges shown in the “After” picture.  Note carefully that you need a
 generalized edge to capture the attachment of the two haplotype bubbles in the “After” picture.
 
-![Fig. 2](DAS.Fig2.png)
+![Example of utility of general edges](DAS.Fig2.png)
  
 While one has graphs in which vertex sequences actually overlap as above, one also frequently
 encounters models in which there is no overlap (basically edge-labelled models captured in a
@@ -159,8 +165,7 @@ command, or might specify decisions about tours through the graph.  The P is imm
 follwed by U or O indicating either an *unordered* or *ordered* collection.  The remainder of
 the line then consists of a name for the collection followed by a non-empty list of ID's
 refering to segments and/or edges that are *separated by single spaces* (i.e. the list is
-in a single column of the tab-delimited format).  An unordered
-collection refers to
+in a single column of the tab-delimited format).  An unordered collection refers to
 the subgraph induced by the vertices and edges in the collection (i.e. one adds all edges
 between a pair of segments in the list and one adds all segments adjacent to edges in the
 list.)   An ordered collection captures paths in the graph consisting of the listed objects
@@ -179,12 +184,20 @@ when a segment with the id does not exist.
 ## EXTENSIONS
 
 ```
-<link>     <- L <eid:id> <sid1:id> [+-] <sid2:id>
+<link>     <- L <eid:id> <sid1:id> [+-] <sid2:id> [+-]
                          <ovl1:int> <ovl2:int> {<alignment>}
 ```
 
-Some users want a specific specification for edges that encode dovetail overlaps.  That
-is, <code>L s1 + s2 o1 o2</code> is a short hand for <code>E s1 + s2 $o1 $ 0 o2</code>.
+Some users want a specific specification for edges that encode dovetail overlaps reminiscent
+of the L-line in GFA.  The table below gives the direct translation from an L-line into
+the more general E-line, and serves effectively as the definition of an L-line's semantics:
+
+```
+L s1 + s2 + o1 o2       <==>      E s1 + s2 $o1  $0   0  o2
+L s1 + s2 - o1 o2       <==>      E s1 - s2 $o1  $0 $o2  $0
+L s1 - s2 + o1 o2       <==>      E s1 - s2   0  o1   0  o2
+L s1 - s2 - o1 o2       <==>      E s1 + s2   0  o1 $o2  $0
+```
 
 ## BACKWARD COMPATIBILITY WITH GFA
 
@@ -192,7 +205,7 @@ DAS is a superset of GFA, that is, everything that can be encoded in GFA can be 
 in DAS, with a relatively straightforward transformation of each input line.
 
 On the otherhand, a GFA parser, even one that accepts optional SAM-tags at the end of a
-defined line type, and which ignores line types it doesn't define, will not accept a
+defined line type, and which ignores line types not defined in GFA, will not accept a
 DAS specification because of changes in the defined fields of the S- and P-lines.
 Acheving this also makes no sense because DAS extends what was encoded in the L- and
 C-lines of GFA with a single E-line generalization.  So any useful DAS reader must
@@ -207,7 +220,7 @@ are as follows:
 2. The L- and C-lines have been replaced by a consolidated E-line.
 
 3. The P-line has been enhanced to encode both subgraphs and paths, and can take
-   edge id's that obviate the need for describing the alignment between segments.
+   edge id's, obviating the need for orientation signs and alignments between segments.
 
 4. There is a new F-line for describing multi-alignments.
 
