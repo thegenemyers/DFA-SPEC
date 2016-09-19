@@ -1,18 +1,15 @@
-# **DAS: The Dagstuhl Assembly Specification (V 1.0)**
-
-*J. Chin, R.Durbin, G. Myers*  
-*Aug. 31, 2016*
+# **GFA 2.0: Proposal**
 
 ## PROLOG
 
-DAS is a generalization of GFA that allows one to specify an assembly graph in either less detail,
+GFA2 is a generalization of GFA that allows one to specify an assembly graph in either less detail,
 e.g. just the topology of the graph, or more detail, e.g. the multi-alignment of reads giving
-rise to each sequence.  We further designed it to be a suitable representation for a string
+rise to each sequence.  It is further designed to be a able to represent a string
 graph at any stage of assembly, from the graph of all overlaps, to a final resolved assembly
-of contig paths with multi-alignments.  Apart from meeting our needs, the extensions also
+of contig paths with multi-alignments.  Apart from meeting these needs, the extensions also
 supports other assembly and variation graph types.
 
-We further want to emphasize that we are proposing a core standard.  As will be seen later in
+The proposal if for a *core standard*.  As will be seen later in
 the technical specification, the format is **extensible** in that additional description lines
 can be added and additional SAM tags can be appended to core description lines.
 
@@ -70,7 +67,7 @@ operator <-, and the following marks:
   * + one-or-more
   * [] a set of one character alternatives.
 
-Like GFA, DAS is tab-delimited in that every lexical token is separated from the next
+Like GFA, GFA2 is tab-delimited in that every lexical token is separated from the next
 by a single tab.
 
 Each descriptor line must begin with a letter and lies on a single line with no white space
@@ -78,7 +75,7 @@ before the first symbol.   The tokens that generate descriptor lines are \<heade
 \<fragment\>, \<edge\>, \<gap\>, and \<group\>.
 Any line that does not begin with a recognized code (i.e. H, S, F, E, G, or P) can be ignored.
 This will allow users to have additional descriptor lines specific to their special processes.
-Moreover, the suffix of any DAS descriptor line may contain any number of user-specific SAM
+Moreover, the suffix of any GFA2 descriptor line may contain any number of user-specific SAM
 tags which are ignored by software designed to support the core standard.
 
 ## SEMANTICS
@@ -95,7 +92,7 @@ The segment sequences and any CIGAR strings referring to them if present follow 
 
 Fragments, if present, are encoded in F-lines that give (a) the segment they belong to, (b) the
 orientation of the fragment to the segment, (c) an external ID that references a sequence
-in an external collection (e.g. a database of reads or segments in another DAS or SAM file),
+in an external collection (e.g. a database of reads or segments in another GFA2 or SAM file),
 (d) the interval of the vertex segment that the external string contributes to, and (e)
 the interval of the fragment that contributes to to segment.  One concludes with either a
 trace or CIGAR string detailing the alignment, or a \* if absent.
@@ -127,8 +124,8 @@ the two segments.  A trace string by contrast is given when one simply wants an 
 method for computing an alignment between the two intervals.  If a \* is given as the alignment
 note that it is still possible to compute the implied alignment by brute force.
 
-The DAS concept of edge generalizes the link and containment lines of GFA.  For example a GFA
-edge which encodes what is called a dovetail overlap (because two ends overlap) is simply a DAS
+The GFA2 concept of edge generalizes the link and containment lines of GFA.  For example a GFA
+edge which encodes what is called a dovetail overlap (because two ends overlap) is simply a GFA2
 edge where end1 = $0 and beg2 = 0 or beg1 = 0 and end2 = $0.   A GFA containment is
 modeled by the case where beg2 = 0 and end2 = $0 or beg1 = 0 and end1 = $0.  The figure
 below illustrates:
@@ -201,14 +198,14 @@ L s1 - s2 - o1 o2       <==>      E s1 + s2   0  o1 $o2  $0
 
 ## BACKWARD COMPATIBILITY WITH GFA
 
-DAS is a superset of GFA, that is, everything that can be encoded in GFA can be encoded
-in DAS, with a relatively straightforward transformation of each input line.
+GFA2 is a superset of GFA, that is, everything that can be encoded in GFA can be encoded
+in GFA2, with a relatively straightforward transformation of each input line.
 
 On the otherhand, a GFA parser, even one that accepts optional SAM-tags at the end of a
 defined line type, and which ignores line types not defined in GFA, will not accept a
-DAS specification because of changes in the defined fields of the S- and P-lines.
-Acheving this also makes no sense because DAS extends what was encoded in the L- and
-C-lines of GFA with a single E-line generalization.  So any useful DAS reader must
+GFA2 specification because of changes in the defined fields of the S- and P-lines.
+Acheving this also makes no sense because GFA2 extends what was encoded in the L- and
+C-lines of GFA with a single E-line generalization.  So any useful GFA2 reader must
 read E-lines, and therefore must be an extension of a GFA parser anyway.
 
 The syntactic conventions, however, are identical to GFA.  Each description line begins
