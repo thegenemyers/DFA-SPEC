@@ -212,11 +212,10 @@ in DAF, with a relatively straightforward transformation of each input line.
 On the otherhand, a GFA parser, even one that accepts optional SAM-tags at the end of a
 defined line type, and which ignores line types not defined in GFA, will not accept a
 DAF specification because of changes in the defined fields of the S- and P-lines.
-Acheving this also makes no sense because DAF extends what was encoded in the L- and
-C-lines of GFA with a single E-line generalization.  So any useful DAF reader must
-read E-lines, and therefore must be an extension of a GFA parser anyway.
+Moreover, any useful DAF reader must process E-lines which replace L- and C-lines.
 
-The syntactic conventions, however, are identical to GFA.  Each description line begins
+The syntactic conventions, however, are identical to GFA, so upgrading a GFA parser to
+a DFA parser is relatively straight forward.  Each description line begins
 with a single letter and has a fixed set of fields that are tab-delimited.  The changes
 are as follows:
 
