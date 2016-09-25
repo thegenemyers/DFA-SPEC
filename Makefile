@@ -1,7 +1,7 @@
-all: DAS-spec.pdf
+all: DAF-spec.pdf
 
 clean:
-	rm -f DAS-spec.pdf
+	rm -f DAF-spec.pdf
 
 %.pdf: %.md
 	pandoc --toc -S -o $@ $<

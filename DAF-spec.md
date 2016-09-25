@@ -1,11 +1,11 @@
-# **DAS: The Dagstuhl Assembly Specification (V 1.0)**
+# **DAF: The Dagstuhl Assembly Format (V 1.0)**
 
 *J. Chin, R.Durbin, G. Myers*  
 *Aug. 31, 2016*
 
 ## PROLOG
 
-DAS is a generalization of GFA that allows one to specify an assembly graph in either less detail,
+DAF is a generalization of GFA that allows one to specify an assembly graph in either less detail,
 e.g. just the topology of the graph, or more detail, e.g. the multi-alignment of reads giving
 rise to each sequence.  We further designed it to be a suitable representation for a string
 graph at any stage of assembly, from the graph of all overlaps, to a final resolved assembly
@@ -70,7 +70,7 @@ operator <-, and the following marks:
   * + one-or-more
   * [] a set of one character alternatives.
 
-Like GFA, DAS is tab-delimited in that every lexical token is separated from the next
+Like GFA, DAF is tab-delimited in that every lexical token is separated from the next
 by a single tab.
 
 Each descriptor line must begin with a letter and lies on a single line with no white space
@@ -78,7 +78,7 @@ before the first symbol.   The tokens that generate descriptor lines are \<heade
 \<fragment\>, \<edge\>, \<gap\>, and \<group\>.
 Any line that does not begin with a recognized code (i.e. H, S, F, E, G, or P) can be ignored.
 This will allow users to have additional descriptor lines specific to their special processes.
-Moreover, the suffix of any DAS descriptor line may contain any number of user-specific SAM
+Moreover, the suffix of any DAF descriptor line may contain any number of user-specific SAM
 tags which are ignored by software designed to support the core standard.
 
 ## SEMANTICS
@@ -96,7 +96,7 @@ The segment sequences and any CIGAR strings referring to them if present follow 
 
 Fragments, if present, are encoded in F-lines that give (a) the segment they belong to, (b) the
 orientation of the fragment to the segment, (c) an external ID that references a sequence
-in an external collection (e.g. a database of reads or segments in another DAS or SAM file),
+in an external collection (e.g. a database of reads or segments in another DAF or SAM file),
 (d) the interval of the vertex segment that the external string contributes to, and (e)
 the interval of the fragment that contributes to to segment.  One concludes with either a
 trace or CIGAR string detailing the alignment, or a \* if absent.
@@ -128,13 +128,13 @@ the two segments.  A trace string by contrast is given when one simply wants an 
 method for computing an alignment between the two intervals.  If a \* is given as the alignment
 note that it is still possible to compute the implied alignment by brute force.
 
-The DAS concept of edge generalizes the link and containment lines of GFA.  For example a GFA
-edge which encodes what is called a dovetail overlap (because two ends overlap) is simply a DAS
+The DAF concept of edge generalizes the link and containment lines of GFA.  For example a GFA
+edge which encodes what is called a dovetail overlap (because two ends overlap) is simply a DAF
 edge where end1 = $0 and beg2 = 0 or beg1 = 0 and end2 = $0.   A GFA containment is
 modeled by the case where beg2 = 0 and end2 = $0 or beg1 = 0 and end1 = $0.  The figure
 below illustrates:
 
-![Illustration of position and edge definitions](DAS.Fig1.png)
+![Illustration of position and edge definitions](DAF.Fig1.png)
 
 Special codes could be adopted for dovetail and containment relationships but the thought is
 there is no particular reason to do so, the use of the special characters for terminal positions
@@ -145,7 +145,7 @@ bubbles as the primary “contig”, and then capture the two buble alternatives
 linked with generalized edges shown in the “After” picture.  Note carefully that you need a
 generalized edge to capture the attachment of the two haplotype bubbles in the “After” picture.
 
-![Example of utility of general edges](DAS.Fig2.png)
+![Example of utility of general edges](DAF.Fig2.png)
  
 While one has graphs in which vertex sequences actually overlap as above, one also frequently
 encounters models in which there is no overlap (basically edge-labelled models captured in a
@@ -166,7 +166,11 @@ command, or might specify decisions about tours through the graph.  The P is imm
 follwed by U or O indicating either an *unordered* or *ordered* collection.  The remainder of
 the line then consists of a name for the collection followed by a non-empty list of ID's
 refering to segments and/or edges that are *separated by single spaces* (i.e. the list is
-in a single column of the tab-delimited format).  An unordered collection refers to
+in a single column of the tab-delimited format).  P-lines with the same name are considered
+to be concatenated together in the order in which they appear, and a group list may refer
+to another group recursively.
+
+An unordered collection refers to
 the subgraph induced by the vertices and edges in the collection (i.e. one adds all edges
 between a pair of segments in the list and one adds all segments adjacent to edges in the
 list.)   An ordered collection captures paths in the graph consisting of the listed objects
@@ -202,14 +206,14 @@ L s1 - s2 - o1 o2       <==>      E s1 + s2   0  o1 $o2  $0
 
 ## BACKWARD COMPATIBILITY WITH GFA
 
-DAS is a superset of GFA, that is, everything that can be encoded in GFA can be encoded
-in DAS, with a relatively straightforward transformation of each input line.
+DAF is a superset of GFA, that is, everything that can be encoded in GFA can be encoded
+in DAF, with a relatively straightforward transformation of each input line.
 
 On the otherhand, a GFA parser, even one that accepts optional SAM-tags at the end of a
 defined line type, and which ignores line types not defined in GFA, will not accept a
-DAS specification because of changes in the defined fields of the S- and P-lines.
-Acheving this also makes no sense because DAS extends what was encoded in the L- and
-C-lines of GFA with a single E-line generalization.  So any useful DAS reader must
+DAF specification because of changes in the defined fields of the S- and P-lines.
+Acheving this also makes no sense because DAF extends what was encoded in the L- and
+C-lines of GFA with a single E-line generalization.  So any useful DAF reader must
 read E-lines, and therefore must be an extension of a GFA parser anyway.
 
 The syntactic conventions, however, are identical to GFA.  Each description line begins
