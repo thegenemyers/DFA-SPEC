@@ -117,7 +117,7 @@ allows one to conveniently address end-relative positions without knowing the le
 the segments.  Note carefully, that the segment and fragment intervals in an F-line are
 also positions.
 
-Note carefully, that the positions intervals are always intervals in the segment in its normal
+Note carefully, that the position intervals are always intervals in the segment in its normal
 orientation.  If a minus sign is specified, then the interval of the second segment is
 reverse complemented in order to align with the interval of the first segment.  That is,
 <code>S s1 - s2 b1 e1 b2 e2</code> aligns s1[b1,e1] to the reverse complement of s2[b2,e2].
