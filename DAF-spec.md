@@ -23,7 +23,9 @@ actual sequence is optional.  In the direction of more detail, one can optionall
 collection of external sequences, called **fragments**, from which the sequence was derived (if
 applicable) and how they multi-align to produce the sequence.  Similarly, the specification
 of an edge need only describe the range of base pairs aligned in each string, and optionally
-contain a **trace** or a **CIGAR string** to describe the alignment of the edge.  Traces are a
+contain a [**Dazzler-trace**](http://wp.me/p4o3kW-88)
+or a [**CIGAR string**](https://samtools.github.io/hts-specs/SAMv1.pdf)
+to describe the alignment of the edge.  Traces are a
 space-efficient Dazzler assembler concept that allow one to efficiently reconstruct an
 alignment in linear time, and CIGAR strings are a SAM concept explicitly detailing the
 columns of an alignment.  Many new technologies such a Hi-C and BioNano maps organize segments
@@ -83,25 +85,26 @@ tags which are ignored by software designed to support the core standard.
 
 ## SEMANTICS
 
-The header contains an optional 'VN' SAM-tag version number, 1.0, and an optional 'TS' SAM-tag specifying
+The **header** contains an optional 'VN' SAM-tag version number, 1.0, and an optional
+'TS' SAM-tag specifying
 the trace point spacing for any Dazzler traces specified to accelerate alignment computation.
 Any number of header lines containing SAM-tags may occur.
 
-A segment is specified by an S-line giving a user-specified ID for the
+A **segment** is specified by an S-line giving a user-specified ID for the
 sequence, its length in bases, and the string of bases denoted by the segment or * if absent.
 The length does not need to be the actual length of the sequence, if given, but is rather
 an indication to a drawing program of how long to draw the representation of the segment.
 The segment sequences and any CIGAR strings referring to them if present follow the
 *unpadded* SAM convention.
 
-Fragments, if present, are encoded in F-lines that give (a) the segment they belong to, (b) the
+**Fragments**, if present, are encoded in F-lines that give (a) the segment they belong to, (b) the
 orientation of the fragment to the segment, (c) an external ID that references a sequence
 in an external collection (e.g. a database of reads or segments in another DAF or SAM file),
 (d) the interval of the vertex segment that the external string contributes to, and (e)
 the interval of the fragment that contributes to to segment.  One concludes with either a
 trace or CIGAR string detailing the alignment, or a \* if absent.
 
-Edges are encoded in E-lines that in general represent a local alignment between arbitrary
+**Edges** are encoded in E-lines that in general represent a local alignment between arbitrary
 intervals of the sequences of the two vertices in question. One gives first an edge ID and
 then the segment ID’s of the two vertices and a + or – sign between them to indicate whether
 the second segment should be complemented or not.  An edge ID does not need to be unique or
@@ -117,12 +120,15 @@ allows one to conveniently address end-relative positions without knowing the le
 the segments.  Note carefully, that the segment and fragment intervals in an F-line are
 also positions.
 
-Note carefully, that the position intervals are always intervals in the segment in its normal
+Position intervals are always intervals in the segment in its normal
 orientation.  If a minus sign is specified, then the interval of the second segment is
 reverse complemented in order to align with the interval of the first segment.  That is,
 <code>S s1 - s2 b1 e1 b2 e2</code> aligns s1[b1,e1] to the reverse complement of s2[b2,e2].
 
-A field for a CIGAR string or trace describing the alignment is last, but may be absent
+A field for a 
+[**CIGAR string**](https://samtools.github.io/hts-specs/SAMv1.pdf)
+or [**Dazzler-trace**](http://wp.me/p4o3kW-88)
+describing the alignment is last, but may be absent
 by giving a \*.  One gives a CIGAR string to describe an exact alignment relationship between
 the two segments.  A trace string by contrast is given when one simply wants an accelerated
 method for computing an alignment between the two intervals.  If a \* is given as the alignment
@@ -154,18 +160,18 @@ vertex-labelled form).  This is captured by edges for which beg1 = end1 and beg2
 
 While not a concept for pure DeBrujin or long-read assemblers, it is the case that paired end
 data and external maps often order and orient contigs/vertices into scaffolds with
-intervening gaps.  To this end we introduce a “gap” edge described in G-lines that give the
+intervening gaps.  To this end we introduce a **gap** edge described in G-lines that give the
 estimated gap distance between the two vertex sequences and the variance of that estimate
 or 0 if no estimate is available.  Relationships in E-lines are fixed and known, where as
 in a G-line, the distance is an estimate and the line type is intended to allow one to
 define assembly **scaffolds**.
 
-A group encoding on a P-line allows one to name and specify a subgraph of the overall graph.
+A **group** encoding on a P-line allows one to name and specify a subgraph of the overall graph.
 Such a collection could for example be hilighted by a drawing program on
 command, or might specify decisions about tours through the graph.  The P is immediately
-follwed by U or O indicating either an *unordered* or *ordered* collection.  The remainder of
+followed by U or O indicating either an *unordered* or *ordered* collection.  The remainder of
 the line then consists of a name for the collection followed by a non-empty list of ID's
-refering to segments and/or edges that are *separated by single spaces* (i.e. the list is
+referring to segments and/or edges that are *separated by single spaces* (i.e. the list is
 in a single column of the tab-delimited format).  P-lines with the same name are considered
 to be concatenated together in the order in which they appear, and a group list may refer
 to another group recursively.
@@ -206,7 +212,7 @@ L s1 - s2 - o1 o2       <==>      E s1 + s2   0  o1 $o2  $0
 
 ## BACKWARD COMPATIBILITY WITH GFA
 
-DAF is a superset of GFA, that is, everything that can be encoded in GFA can be encoded
+DAF is a super-set of GFA, that is, everything that can be encoded in GFA can be encoded
 in DAF, with a relatively straightforward transformation of each input line.
 
 On the otherhand, a GFA parser, even one that accepts optional SAM-tags at the end of a
@@ -215,7 +221,7 @@ DAF specification because of changes in the defined fields of the S- and P-lines
 Moreover, any useful DAF reader must process E-lines which replace L- and C-lines.
 
 The syntactic conventions, however, are identical to GFA, so upgrading a GFA parser to
-a DFA parser is relatively straight forward.  Each description line begins
+a DAF parser is relatively straight forward.  Each description line begins
 with a single letter and has a fixed set of fields that are tab-delimited.  The changes
 are as follows:
 
