@@ -46,11 +46,11 @@ assembly can be described.  Finally, one can describe and attach a name to any *
 <fragment> <- F <sid:id> [+-] <external:id>
                   <sbeg:pos> <send:pos> <fbeg:pos> <fend:pos> <alignment>
 
-<edge>     <- E <eid:id> <sid1:id> [+-] <sid2:id> [+-]
+<edge>     <- E <eid:id> <sid1:id> [+-] <sid2:id>
                          <beg1:pos> <end1:pos> <beg2:pos> <end2:pos> <alignment>
 
-<gap>      <- G <eid:id> <sid1:id> [+-] <sid2:id> [+-]
-                         <dist:int> <var:int>
+<gap>      <- G <eid:id> <sid1:id> [+-] <sid2:id>
+                         <disp:pos> <var:int>
 
 <group>    <- [UO] <pid:id> <item>([ ]<item>)*
 
@@ -169,8 +169,13 @@ vertex-labelled form).  This is captured by edges for which beg1 = end1 and beg2
 While not a concept for pure DeBrujin or long-read assemblers, it is the case that paired end
 data and external maps often order and orient contigs/vertices into scaffolds with
 intervening gaps.  To this end we introduce a **gap** edge described in G-lines that give the
-estimated gap distance between the two vertex sequences and the variance of that estimate
-or 0 if no estimate is available.  Relationships in E-lines are fixed and known, where as
+estimated gap distance between the two segment sequences and the variance of that estimate
+or 0 if no estimate is available.  The first segment is in always in the normal orientation.
+If the displacement is an integer g (no $-prefix), then g is the estimated distance from the
+*end of the first segment forward* to the second fragment in the orientation specified by the sign.
+If the displacement is $g, then the g is the estimated distance from the *start of the
+first segment backward* to the second fragment in the orientation specified by the sign.
+Relationships in E-lines are fixed and known, where as
 in a G-line, the distance is an estimate and the line type is intended to allow one to
 define assembly **scaffolds**.
 
@@ -198,7 +203,8 @@ There is a single name-space for the set of all id's, whether for segments, edge
 All segments and group id's must be unique, but any number of edges can share the same ID
 (e.g. something simple like *), as long as they do not need to be referred to in a group
 list.  Because there can be more than one edge between a given pair of segments, a pair
-of segments does not always suffice to uniquely identify an edge for a path, and so onemust in thes cases refer to the desired edge whose id must be unique.  Every id in a
+of segments does not always suffice to uniquely identify an edge for a path, and so one
+must in thes cases refer to the desired edge whose id must be unique.  Every id in a
 group list must refer to a unique ID, it is an error otherwise.
 
 ## BACKWARD COMPATIBILITY WITH GFA
