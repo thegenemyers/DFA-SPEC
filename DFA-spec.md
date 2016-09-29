@@ -218,7 +218,7 @@ are as follows:
 3. The P-line has been replaced with U- and O-lines that encode subgraphs and paths, respectively,
    and can take edge id's, obviating the need for orientation signs and alignments between segments.
 
-4. There is a new F-line for describing multi-alignments and a new F-line for describing scaffolds.
+4. There is a new F-line for describing multi-alignments and a new G-line for describing scaffolds.
 
 5. Alignments can be trace length sequences as well as CIGAR strings.
 
