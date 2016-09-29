@@ -197,7 +197,7 @@ the edge between two consecutive segments, the segment between two consecutive e
 There is a single name-space for the set of all id's, whether for segments, edges, or groups.
 All segments and group id's must be unique, but any number of edges can share the same ID
 (e.g. something simple like *), as long as they do not need to be referred to in a group
-list.  Because there can be more than one edge between a given pair of segments, a pair   
+list.  Because there can be more than one edge between a given pair of segments, a pair
 of segments does not always suffice to uniquely identify an edge for a path, and so onemust in thes cases refer to the desired edge whose id must be unique.  Every id in a
 group list must refer to a unique ID, it is an error otherwise.
 
@@ -218,7 +218,7 @@ are as follows:
 3. The P-line has been replaced with U- and O-lines that encode subgraphs and paths, respectively,
    and can take edge id's, obviating the need for orientation signs and alignments between segments.
 
-4. There is a new F-line for describing multi-alignments.
+4. There is a new F-line for describing multi-alignments and a new F-line for describing scaffolds.
 
 5. Alignments can be trace length sequences as well as CIGAR strings.
 
