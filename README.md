@@ -4,8 +4,8 @@ Jason Chin, Richard Durbin, and myself (Gene Myers) found ourselves together at 
 meeting in Dagstuhl Germany and hammered out an initial proposal for an assembly format.
 We thought [GFA](https://github.com/pmelsted/GFA-spec) was a good start point and built a
 more comprehensive
-design around it.  We are calling this preliminary version the "Dagstuhl Assembly Format" or
-[DAF](DAF-spec.md) and offer it up here for comment, criticism, and suggestions with the hope that
+design around it.  We are calling this preliminary version the "The Dagstuhl Format for Assembly" or
+[DFA](DFA-spec.md) and offer it up here for comment, criticism, and suggestions with the hope that
 eventually some version of it might find adoption.
 
 The reason that we want a standard is that we find that
@@ -16,4 +16,4 @@ would benefit from a standard encoding format that would make them all interoper
 
 ![Fig. 1](READ.Fig1.png)
 
-The white paper is [here](DAF-spec.md)
+The white paper is [here](DFA-spec.md)
